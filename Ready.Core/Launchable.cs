@@ -48,9 +48,13 @@ namespace Ready.Core
 
         private void Process_Exited(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Proc exited.")
-;       }
+            Process.EnableRaisingEvents = false;
+            Process.Exited -= Process_Exited;
+            Process.Dispose();
 
+            SetStatus(Status.Exited);
+        }
+        
         internal void SetStatus(Status status)
         {
             if (this.status == status)

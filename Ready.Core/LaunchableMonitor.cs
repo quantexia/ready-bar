@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Ready.Core
 {
-    class LaunchableMonitor
+    public class LaunchableMonitor
     {
+
     }
 }
