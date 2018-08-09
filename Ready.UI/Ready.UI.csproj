@@ -114,6 +114,7 @@
     <PostBuildEvent>copy "$(TargetDir)*.*" "$(SolutionDir)build\*.*"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>del "$(SolutionDir)build\*.*" /Q</PreBuildEvent>
+    <PreBuildEvent>if not exist "$(SolutionDir)build\" (mkdir "$(SolutionDir)build")
+del "$(SolutionDir)build\*.*" /Q</PreBuildEvent>
   </PropertyGroup>
 </Project>
