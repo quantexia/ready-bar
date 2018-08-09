@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <ListView>
+            <ListView ItemsSource="{Binding}">
 
             </ListView>
         </StackPanel>

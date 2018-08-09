@@ -9,10 +9,11 @@ namespace Ready.Core
     public enum Status
     {
         None,
-        Launching,
 
+        Launching,
         Available,
+
         WithUser,
-        Gone
+        Exited
     }
 }

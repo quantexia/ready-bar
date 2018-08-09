@@ -34,9 +34,11 @@ namespace Ready.Core
         {
             Task.Factory.StartNew(() =>
             {
+                Process.EnableRaisingEvents = true;
                 Process.Exited += Process_Exited;
-               Process.Start();
-               SetStatus(Status.Launching);
+
+                Process.Start();
+                SetStatus(Status.Launching);
             }).ContinueWith(t =>
             {
                Thread.Sleep(Delay * 1000);

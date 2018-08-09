@@ -30,20 +30,27 @@ namespace Ready.UI
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string content = ((Button)sender).Content.ToString();
-            LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
-
+            
             if (content == "Init")
             {
-                lvm = new LauncherViewModel();
-                lvm.Targets = new List<Launchable>
+                LauncherViewModel lvm = new LauncherViewModel();
+                lvm.Targets = new System.Collections.ObjectModel.ObservableCollection<Launchable>(new List<Launchable>
                 {
-                    new Launchable() { Executable = "notepad.exe", Arguments = "", Delay = 5}
-                };
+                    new Launchable("notepad.exe", "")
+                });
+                this.lsv.DataContext = lvm;
             }
-            if (content = "Go")
+            if (content == "Go")
             {
+                LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
                 Launchable lcb = lvm.Targets.First();
                 lcb.Launch();
+            }
+            if (content == "Ex")
+            {
+                LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
+                Launchable lcb = lvm.Targets.First();
+                MessageBox.Show(lcb.Process.Id.ToString());
             }
         }
     }
