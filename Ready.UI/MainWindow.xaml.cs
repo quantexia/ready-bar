@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ready.Core;
+using Ready.UI.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +25,26 @@ namespace Ready.UI
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string content = ((Button)sender).Content.ToString();
+            LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
+
+            if (content == "Init")
+            {
+                lvm = new LauncherViewModel();
+                lvm.Targets = new List<Launchable>
+                {
+                    new Launchable() { Executable = "notepad.exe", Arguments = "", Delay = 5}
+                };
+            }
+            if (content = "Go")
+            {
+                Launchable lcb = lvm.Targets.First();
+                lcb.Launch();
+            }
         }
     }
 }

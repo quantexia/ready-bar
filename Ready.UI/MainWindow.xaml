@@ -8,6 +8,10 @@
         mc:Ignorable="d" Title="MainWindow" 
         Height="450" Width="200">
     <DockPanel LastChildFill="True">
-        <controls:LauncherStackView/>
+        <StackPanel DockPanel.Dock="Bottom">
+            <Button Content="Init" Width="50" Click="Button_Click"></Button>
+            <Button Content="Go" Width="50" Click="Button_Click"></Button>
+        </StackPanel>
+        <controls:LauncherStackView x:Name="lsv"/>
     </DockPanel>
 </Window>
