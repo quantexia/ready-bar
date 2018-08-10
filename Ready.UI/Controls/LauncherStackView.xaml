@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Ready.UI.Controls"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="200">
+             d:DesignHeight="450" d:DesignWidth="200"
+             >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -13,8 +15,19 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <ListView ItemsSource="{Binding}">
-
+            <ListView ItemsSource="{Binding Targets}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ListViewItem MouseDoubleClick="ListViewItem_MouseDoubleClick">
+                            <Border BorderThickness="3" BorderBrush="Aquamarine" Background="Wheat" Width="60" Height="60">    
+                                <StackPanel Orientation="Vertical" >
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                    <TextBlock Text="{Binding Status}"/>
+                                </StackPanel>
+                            </Border>
+                        </ListViewItem>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </StackPanel>
     </Grid>

@@ -13,6 +13,6 @@
             <Button Content="Go" Width="50" Click="Button_Click" />
             <Button Content="Ex" Width="50" Click="Button_Click" />
         </StackPanel>
-        <controls:LauncherStackView x:Name="lsv"/>
+        <controls:LauncherStackView x:Name="lsv" DataContext="{Binding}"/>
     </DockPanel>
 </Window>

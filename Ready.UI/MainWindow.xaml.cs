@@ -36,21 +36,26 @@ namespace Ready.UI
                 LauncherViewModel lvm = new LauncherViewModel();
                 lvm.Targets = new System.Collections.ObjectModel.ObservableCollection<Launchable>(new List<Launchable>
                 {
-                    new Launchable("notepad.exe", "")
+                    new Launchable("notepad.exe", "", "Notepad", 3),
+                    new Launchable("notepad.exe", "", "Notepad", 4),
+                    new Launchable("notepad.exe", "", "Notepad", 5)
                 });
+                foreach (var t in lvm.Targets) t.Launch();
                 this.lsv.DataContext = lvm;
             }
+
             if (content == "Go")
             {
                 LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
                 Launchable lcb = lvm.Targets.First();
-                lcb.Launch();
+                lcb.Reveal();
             }
+
             if (content == "Ex")
             {
                 LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
                 Launchable lcb = lvm.Targets.First();
-                MessageBox.Show(lcb.Process.Id.ToString());
+                //MessageBox.Show(lcb.Process.Id.ToString());
             }
         }
     }

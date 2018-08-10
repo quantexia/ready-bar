@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ready.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,14 @@ namespace Ready.UI.Controls
         public LauncherStackView()
         {
             InitializeComponent();
+        }
+
+        private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Launchable src = (Launchable)((ListViewItem)sender).DataContext;
+            LauncherViewModel lvm = (LauncherViewModel)this.DataContext;
+            if (lvm.InstanceUp.CanExecute(src))
+                lvm.InstanceUp.Execute(src);
         }
     }
 }
