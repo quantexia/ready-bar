@@ -19,10 +19,11 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ListViewItem MouseDoubleClick="ListViewItem_MouseDoubleClick">
-                            <Border BorderThickness="3" BorderBrush="Aquamarine" Background="Wheat" Width="60" Height="60">    
+                            <Border BorderThickness="3" BorderBrush="Aquamarine" Background="Wheat" Width="60">    
                                 <StackPanel Orientation="Vertical" >
                                     <TextBlock Text="{Binding DisplayName}"/>
                                     <TextBlock Text="{Binding Status}"/>
+                                    <TextBlock Text="{Binding Process.Id}"/>
                                 </StackPanel>
                             </Border>
                         </ListViewItem>

@@ -21,7 +21,7 @@ namespace Ready.Core
 
             Process = new Process();
             Process.StartInfo = new ProcessStartInfo(Executable, Arguments) { WindowStyle = ProcessWindowStyle.Minimized };
-
+            
             SetStatus(Status.None);
         }
 
@@ -40,6 +40,9 @@ namespace Ready.Core
                 Process.Exited += Process_Exited;
 
                 Process.Start();
+                Notify("Process");
+
+                Process.WaitForInputIdle();
                 WindowHandling.ShowWindow(Process.MainWindowHandle, WindowHandling.SW_HIDE);
 
                 SetStatus(Status.Launching);
@@ -54,7 +57,7 @@ namespace Ready.Core
         {
             //Process.WaitForInputIdle();
             IntPtr hwnd = Process.MainWindowHandle;
-            WindowHandling.ShowWindow(hwnd, WindowHandling.SW_SHOW);
+            WindowHandling.ShowWindow(hwnd, WindowHandling.SW_SHOWNORMAL);
             
             SetStatus(Status.WithUser);
         }
@@ -66,6 +69,7 @@ namespace Ready.Core
             Process.Dispose();
 
             SetStatus(Status.Exited);
+            Notify("Process");
 
             RaiseExited();
         }
