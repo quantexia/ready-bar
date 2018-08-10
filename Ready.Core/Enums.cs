@@ -12,6 +12,7 @@ namespace Ready.Core
 
         Launching,
         Available,
+        Reserved,
 
         WithUser,
         Exited

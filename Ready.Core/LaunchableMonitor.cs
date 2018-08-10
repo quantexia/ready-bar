@@ -9,27 +9,99 @@ namespace Ready.Core
 {
     public class LaunchableMonitor
     {
-        private ObservableCollection<Launchable> coll;
+        private List<Launchable> coll;
+        private Launchable target;
+        private const int MIN = 0;
+        private const int MAX = 20;
 
         public LaunchableMonitor()
         {
-            coll = new ObservableCollection<Launchable>();
+            coll = new List<Launchable>();
         }
 
         public void Provision(Launchable lb, int quantity)
         {
-            var pr = new List<Launchable> { lb, lb.Clone(), lb.Clone() };
-            pr.ForEach(l => l.HasExited += OnLaunchableExit );
-
+            this.target = lb;
+            SetProvisionLevel(quantity);
         }
 
-        public ObservableCollection<Launchable> Launchables { get { return coll; } }
+        public void SetProvisionLevel(int quantity)
+        {
+            if (quantity < MIN || quantity > MAX)
+                throw new ArgumentOutOfRangeException("quantity", string.Format("Must be between {0} and {1}", MIN, MAX));
+
+            int cnt = coll.Count(l => l.Status == Status.Available);
+            int delta = quantity - cnt;
+
+            switch(Math.Sign(delta))
+            { 
+                case -1:
+                    Enumerable.Range(0, -delta)
+                                .ForEach(i => Remove());
+                    break;
+                case 1:
+                    Enumerable.Range(0, delta)
+                                .ForEach(i => Add());
+                    break;
+                case 0:
+                    /*nothing*/
+                    break;
+            }
+        }
+
+        private void Add()
+        {
+            Launchable l = target.Clone();
+            l.HasExited += OnLaunchableExit;
+            coll.Add(l);
+            l.Launch();
+        }
+
+        private void Remove()
+        {
+            Launchable r = GetAvailable();
+            if (r != null)
+            {
+                r.SetStatus(Status.Reserved);
+                coll.Remove(r);
+                r.HasExited -= OnLaunchableExit;
+                r.Process.Dispose(); //CHECK if necessary
+            }
+        }
+
+        public IReadOnlyList<Launchable> Launchables { get { return coll; } }
 
         private void OnLaunchableExit(object sender, EventArgs e)
         {
             Launchable src = (Launchable)sender;
-            Launchable next = src.Clone();
-            coll.Add(next);
+            src.HasExited -= OnLaunchableExit;
+            coll.Remove(src);
+
+            Add();
+        }
+
+        public bool HasAvailable()
+        {
+            Launchable l;
+            return TryGetAvailable(out l);
+        }
+
+        public Launchable GetAvailable()
+        {
+            Launchable l;
+            TryGetAvailable(out l);
+            return l;
+        }
+
+        public bool TryGetAvailable(out Launchable available)
+        {
+            available = coll.FirstOrDefault(l => l.Status == Status.Available);
+            return available == null;
+        }
+
+        public int CountAvailable()
+        {
+            return coll.Count(l => l.Status == Status.Available);
         }
     }
 }

@@ -2,6 +2,7 @@
 using Ready.UI.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,9 +23,12 @@ namespace Ready.UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private LaunchableMonitor lmon = new LaunchableMonitor();
+
         public MainWindow()
         {
             InitializeComponent();
+            this.SourceInitialized += (x, y) => this.HideMinimizeAndMaximizeButtons();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -33,14 +37,10 @@ namespace Ready.UI
             
             if (content == "Init")
             {
+                Launchable lb = new Launchable("notepad.exe", "", "Notepad", 3);
+                lmon.Provision(lb, 3);
                 LauncherViewModel lvm = new LauncherViewModel();
-                lvm.Targets = new System.Collections.ObjectModel.ObservableCollection<Launchable>(new List<Launchable>
-                {
-                    new Launchable("notepad.exe", "", "Notepad", 3),
-                    new Launchable("notepad.exe", "", "Notepad", 4),
-                    new Launchable("notepad.exe", "", "Notepad", 5)
-                });
-                foreach (var t in lvm.Targets) t.Launch();
+                lvm.Targets = new ObservableCollection<Launchable>(lmon.Launchables);
                 this.lsv.DataContext = lvm;
             }
 

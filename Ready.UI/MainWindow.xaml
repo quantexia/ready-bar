@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ready.UI"
         xmlns:controls="clr-namespace:Ready.UI.Controls"
-        mc:Ignorable="d" Title="MainWindow" 
+        mc:Ignorable="d" 
+        Title="Ready Bar" 
         Height="450" Width="200">
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
