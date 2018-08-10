@@ -19,16 +19,22 @@ namespace Ready.Core
             coll = new List<Launchable>();
         }
 
+        public Launchable Target { get { return target; } }
+
         public void Provision(Launchable lb, int quantity)
         {
             this.target = lb;
             SetProvisionLevel(quantity);
         }
 
+        public int ProvisionLevel { get; private set; }
+
         public void SetProvisionLevel(int quantity)
         {
             if (quantity < MIN || quantity > MAX)
                 throw new ArgumentOutOfRangeException("quantity", string.Format("Must be between {0} and {1}", MIN, MAX));
+
+            ProvisionLevel = quantity;
 
             int cnt = coll.Count(l => l.Status == Status.Available);
             int delta = quantity - cnt;
@@ -59,7 +65,7 @@ namespace Ready.Core
 
         private void Remove()
         {
-            Launchable r = GetAvailable();
+            Launchable r = NextAvailable;
             if (r != null)
             {
                 r.SetStatus(Status.Reserved);
@@ -80,28 +86,39 @@ namespace Ready.Core
             Add();
         }
 
-        public bool HasAvailable()
+        public bool HasAvailable
         {
-            Launchable l;
-            return TryGetAvailable(out l);
+            get
+            {
+                Launchable l;
+                return !TryGetAvailable(out l);
+            }
         }
 
-        public Launchable GetAvailable()
+        public Launchable NextAvailable
         {
-            Launchable l;
-            TryGetAvailable(out l);
-            return l;
+            get
+            {
+                Launchable l;
+                TryGetAvailable(out l);
+                return l;
+            }
         }
 
-        public bool TryGetAvailable(out Launchable available)
+        public int CountAvailable
+        {
+            get
+            {
+                return coll.Count(l => l.Status == Status.Available);
+            }
+        }
+
+        private bool TryGetAvailable(out Launchable available)
         {
             available = coll.FirstOrDefault(l => l.Status == Status.Available);
             return available == null;
         }
 
-        public int CountAvailable()
-        {
-            return coll.Count(l => l.Status == Status.Available);
-        }
+        
     }
 }

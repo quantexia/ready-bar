@@ -23,7 +23,8 @@ namespace Ready.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private LaunchableMonitor lmon = new LaunchableMonitor();
+        private LaunchableMonitorViewModel lmvm;
+        private LaunchableMonitor lmon;
 
         public MainWindow()
         {
@@ -37,25 +38,27 @@ namespace Ready.UI
             
             if (content == "Init")
             {
-                Launchable lb = new Launchable("notepad.exe", "", "Notepad", 3);
+                lmon = new LaunchableMonitor();
+                //Launchable lb =new Launchable("notepad.exe", "", "Notepad")
+                Launchable lb = new Launchable("Excel.exe", "", "Excel");
                 lmon.Provision(lb, 3);
-                LauncherViewModel lvm = new LauncherViewModel();
-                lvm.Targets = new ObservableCollection<Launchable>(lmon.Launchables);
-                this.lsv.DataContext = lvm;
+
+                lmvm = new LaunchableMonitorViewModel(lmon);
+                this.vu.DataContext = lmvm;
             }
 
-            if (content == "Go")
+            if (content == "Add")
             {
-                LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
-                Launchable lcb = lvm.Targets.First();
-                lcb.Reveal();
+                lmon.SetProvisionLevel(lmon.ProvisionLevel + 1);
+            }
+            if (content == "Remove")
+            {
+                lmon.SetProvisionLevel(lmon.ProvisionLevel - 1);
             }
 
             if (content == "Ex")
             {
-                LauncherViewModel lvm = (LauncherViewModel)this.lsv.DataContext;
-                Launchable lcb = lvm.Targets.First();
-                //MessageBox.Show(lcb.Process.Id.ToString());
+                
             }
         }
     }

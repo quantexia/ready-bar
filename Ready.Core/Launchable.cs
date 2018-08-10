@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Threading;
 using System.ComponentModel;
+using System.Windows.Media;
+using System.IO;
+using System.Windows.Media.Imaging;
+using System.Windows.Interop;
+using System.Windows;
 
 namespace Ready.Core
 {
@@ -29,8 +34,22 @@ namespace Ready.Core
         public string Arguments { get; private set; }
         public int Delay { get; private set; }
         public string DisplayName { get; private set; }
-        public Image Icon { get; private set; }
         public Process Process { get; private set; }
+
+        public ImageSource Image { get; private set; }
+
+        private void ExtractIcon()
+        {
+            Icon ico = Icon.ExtractAssociatedIcon(Process.MainModule.FileName);
+
+            Bitmap bitmap = ico.ToBitmap();
+            IntPtr hBitmap = bitmap.GetHbitmap();
+
+            ImageSource wpfBitmap =
+                 Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,BitmapSizeOptions.FromEmptyOptions());
+
+            Image = wpfBitmap;
+        }
 
         public void Launch()
         {
@@ -46,10 +65,15 @@ namespace Ready.Core
                 WindowHandling.ShowWindow(Process.MainWindowHandle, WindowHandling.SW_HIDE);
 
                 SetStatus(Status.Launching);
-            }).ContinueWith(t =>
+            })
+            .ContinueWith(t =>
             {
-               Thread.Sleep(Delay * 1000);
-               SetStatus(Status.Available);
+                Thread.Sleep(Delay * 1000);
+                SetStatus(Status.Available);
+            })
+            .ContinueWith(t =>
+            {
+                //ExtractIcon();
             });
         }
 
