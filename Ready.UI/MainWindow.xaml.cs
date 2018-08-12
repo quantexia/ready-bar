@@ -30,6 +30,10 @@ namespace Ready.UI
         {
             InitializeComponent();
             this.SourceInitialized += (x, y) => this.HideMinimizeAndMaximizeButtons();
+
+#if !DEBUG
+            this.spButtons.Visibility = Visibility.Collapsed;
+#endif
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -39,8 +43,8 @@ namespace Ready.UI
             if (content == "Init")
             {
                 lmon = new LaunchableMonitor();
-                //Launchable lb =new Launchable("notepad.exe", "", "Notepad")
-                Launchable lb = new Launchable("Excel.exe", "", "Excel");
+                Launchable lb = new Launchable(@"C:\Windows\notepad.exe", "", "Notepad");
+                //Launchable lb = new Launchable("Excel.exe", "", "Excel");
                 lmon.Provision(lb, 3);
 
                 lmvm = new LaunchableMonitorViewModel(lmon);

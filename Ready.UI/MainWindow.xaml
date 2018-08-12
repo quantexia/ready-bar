@@ -7,9 +7,9 @@
         xmlns:controls="clr-namespace:Ready.UI.Controls"
         mc:Ignorable="d" 
         Title="Ready Bar" 
-        Height="450" Width="200">
+        Height="250" Width="200">
     <DockPanel LastChildFill="True">
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+        <StackPanel x:Name="spButtons" DockPanel.Dock="Bottom" Orientation="Horizontal">
             <Button Content="Init" Width="50" Click="Button_Click"></Button>
             <Button Content="Add" Width="50" Click="Button_Click" />
             <Button Content="Remove" Width="50" Click="Button_Click" />

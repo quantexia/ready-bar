@@ -26,7 +26,7 @@ namespace Ready.Core
 
             Process = new Process();
             Process.StartInfo = new ProcessStartInfo(Executable, Arguments) { WindowStyle = ProcessWindowStyle.Minimized };
-            
+
             SetStatus(Status.None);
         }
 
@@ -40,15 +40,14 @@ namespace Ready.Core
 
         private void ExtractIcon()
         {
-            Icon ico = Icon.ExtractAssociatedIcon(Process.MainModule.FileName);
+            //Icon icon = Icon.ExtractAssociatedIcon(Process.MainModule.FileName);
+            Icon icon = Icon.ExtractAssociatedIcon(Executable);
 
-            Bitmap bitmap = ico.ToBitmap();
-            IntPtr hBitmap = bitmap.GetHbitmap();
-
-            ImageSource wpfBitmap =
-                 Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,BitmapSizeOptions.FromEmptyOptions());
-
-            Image = wpfBitmap;
+            Image = 
+            System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                icon.Handle,
+                new Int32Rect(0, 0, icon.Width, icon.Height),
+                BitmapSizeOptions.FromEmptyOptions());
         }
 
         public void Launch()
@@ -70,16 +69,11 @@ namespace Ready.Core
             {
                 Thread.Sleep(Delay * 1000);
                 SetStatus(Status.Available);
-            })
-            .ContinueWith(t =>
-            {
-                //ExtractIcon();
             });
         }
 
         public void Reveal()
         {
-            //Process.WaitForInputIdle();
             IntPtr hwnd = Process.MainWindowHandle;
             WindowHandling.ShowWindow(hwnd, WindowHandling.SW_SHOWNORMAL);
             
