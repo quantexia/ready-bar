@@ -69,12 +69,23 @@ namespace Ready.Core
             if (r != null)
             {
                 r.SetStatus(Status.Reserved);
-                coll.Remove(r);
                 r.HasExited -= OnLaunchableExit;
-                r.Process.Dispose(); //CHECK if necessary
+                r.Dispose();
+                coll.Remove(r);
             }
         }
 
+        private bool shuttingDown = false;
+        private void OnDispose()
+        {
+            coll.ForEach(l =>
+            {
+                l.Dispose();
+                l.HasExited -= OnLaunchableExit;
+            });
+
+        }
+        
         public IReadOnlyList<Launchable> Launchables { get { return coll; } }
 
         private void OnLaunchableExit(object sender, EventArgs e)
@@ -83,7 +94,8 @@ namespace Ready.Core
             src.HasExited -= OnLaunchableExit;
             coll.Remove(src);
 
-            Add();
+            if (!shuttingDown)
+                Add();
         }
 
         public bool HasAvailable
@@ -115,10 +127,54 @@ namespace Ready.Core
 
         private bool TryGetAvailable(out Launchable available)
         {
-            available = coll.FirstOrDefault(l => l.Status == Status.Available);
+            if (shuttingDown)
+                available = null;
+            else 
+                available = coll.FirstOrDefault(l => l.Status == Status.Available);
+
             return available == null;
         }
 
-        
+        #region IDisposable
+
+        private bool disposed;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this.disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    OnDispose();
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+                //CloseHandle(handle);
+                //handle = IntPtr.Zero;
+
+                // Note disposing has been done.
+                disposed = true;
+            }
+        }
+
+
+        ~LaunchableMonitor()
+        {
+            Dispose(false);
+        }
+#endregion
     }
 }

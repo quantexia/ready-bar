@@ -9,11 +9,24 @@
              d:DesignHeight="250" d:DesignWidth="250"             
              >
     <UserControl.Resources>
-        <Style x:Name="styTBlock" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16"/>
+        <Style x:Key="styTBhead" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
+        <Style x:Key="styTBfield" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
     </UserControl.Resources>
+
+    <inter:Interaction.Triggers>
+        <inter:EventTrigger EventName="Closing">
+            <inter:InvokeCommandAction Command="{Binding CloseCommand}"/>
+        </inter:EventTrigger>
+    </inter:Interaction.Triggers>
+    
     <Border BorderThickness="15" BorderBrush="Aquamarine" Background="AliceBlue">
         <Border.InputBindings>
             <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding LaunchCommand}" />
@@ -28,12 +41,12 @@
             <TextBlock Grid.Row="0" Text="{Binding Launchable.DisplayName}" />
             <Image Grid.Row="1" Source="{Binding Image}" Width="100" Height="100"/>
             <UniformGrid Rows="2" Columns="3" Grid.Row="2">
-                <TextBlock Text="Available"/>
-                <TextBlock Text="Count"/>
-                <TextBlock Text="Pid"/>
-                <TextBlock Text="{Binding HasAvailable}"/>
-                <TextBlock Text="{Binding CountAvailable}"/>
-                <TextBlock Text="{Binding NextPid}" />
+                <TextBlock Text="Available" Style="{StaticResource ResourceKey=styTBhead}"/>
+                <TextBlock Text="Count" Style="{StaticResource styTBhead}"/>
+                <TextBlock Text="Next Pid" Style="{StaticResource styTBhead}"/>
+                <TextBlock Text="{Binding HasAvailable}" Style="{StaticResource styTBfield}"/>
+                <TextBlock Text="{Binding CountAvailable}" Style="{StaticResource styTBfield}"/>
+                <TextBlock Text="{Binding NextPid}" Style="{StaticResource styTBfield}"/>
             </UniformGrid>
         </Grid>
     </Border>

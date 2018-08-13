@@ -7,7 +7,10 @@
         xmlns:controls="clr-namespace:Ready.UI.Controls"
         mc:Ignorable="d" 
         Title="Ready Bar" 
-        Height="250" Width="200">
+        Height="250" Width="200"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+        >
     <DockPanel LastChildFill="True">
         <StackPanel x:Name="spButtons" DockPanel.Dock="Bottom" Orientation="Horizontal">
             <Button Content="Init" Width="50" Click="Button_Click"></Button>
@@ -15,6 +18,6 @@
             <Button Content="Remove" Width="50" Click="Button_Click" />
             <Button Content="Ex" Width="50" Click="Button_Click" />
         </StackPanel>
-        <controls:LaunchableMonitorView x:Name="vu" />
+        <controls:LaunchableMonitorView />
     </DockPanel>
 </Window>

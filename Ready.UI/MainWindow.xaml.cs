@@ -36,34 +36,54 @@ namespace Ready.UI
 #endif
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitializeVM();
+        }
+
+        private void InitializeVM()
+        {
+            lmon = new LaunchableMonitor();
+            Launchable lb = new Launchable(
+                Configuration.GetValue("Executable"),
+                Configuration.GetValue("Arguments")
+                );
+            lmon.Provision(lb, Configuration.GetValue<int>("Provision"));
+
+            lmvm = new LaunchableMonitorViewModel(lmon);
+            this.DataContext = lmvm;
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string content = ((Button)sender).Content.ToString();
             
-            if (content == "Init")
-            {
-                lmon = new LaunchableMonitor();
-                Launchable lb = new Launchable(@"C:\Windows\notepad.exe", "", "Notepad");
-                //Launchable lb = new Launchable("Excel.exe", "", "Excel");
-                lmon.Provision(lb, 3);
-
-                lmvm = new LaunchableMonitorViewModel(lmon);
-                this.vu.DataContext = lmvm;
-            }
 
             if (content == "Add")
             {
+                if (lmon.ProvisionLevel > 20)
+                    return;
+
                 lmon.SetProvisionLevel(lmon.ProvisionLevel + 1);
             }
             if (content == "Remove")
             {
+                if (lmon.ProvisionLevel == 0)
+                    return;
+
                 lmon.SetProvisionLevel(lmon.ProvisionLevel - 1);
             }
 
             if (content == "Ex")
             {
-                
+                string summary =string.Join("\n", lmon.Launchables.Select(l => string.Format("{0} {1}", l.Process.Id, l.Status)));
+                MessageBox.Show(summary);
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            lmon.Dispose();
         }
     }
 }

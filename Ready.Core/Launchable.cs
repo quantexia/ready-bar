@@ -15,17 +15,22 @@ using System.Windows;
 
 namespace Ready.Core
 {
-    public class Launchable : INotifyPropertyChanged
+    public class Launchable : INotifyPropertyChanged, IDisposable
     {
         public Launchable(string executable, string arguments, string displayName = null, int delay = 0)
         {
-            Executable = executable;
+            string fullPath = PathHelper.FindExePath(executable);
+            Executable = fullPath;
+
             Arguments = arguments;
             DisplayName = displayName ?? executable;
             Delay = Math.Max(0, delay);
 
             Process = new Process();
-            Process.StartInfo = new ProcessStartInfo(Executable, Arguments) { WindowStyle = ProcessWindowStyle.Minimized };
+            Process.StartInfo = new ProcessStartInfo(Executable, Arguments) {
+                                            WindowStyle = ProcessWindowStyle.Minimized};
+
+            Task.Run(() => ExtractIcon());
 
             SetStatus(Status.None);
         }
@@ -48,14 +53,16 @@ namespace Ready.Core
                 icon.Handle,
                 new Int32Rect(0, 0, icon.Width, icon.Height),
                 BitmapSizeOptions.FromEmptyOptions());
+
+            Notify("Image");
         }
 
         public void Launch()
         {
-            Task.Factory.StartNew(() =>
+            Task.Factory.StartNew((Action)(() =>
             {
                 Process.EnableRaisingEvents = true;
-                Process.Exited += Process_Exited;
+                Process.Exited += this.Process_Exited;
 
                 Process.Start();
                 Notify("Process");
@@ -64,7 +71,7 @@ namespace Ready.Core
                 WindowHandling.ShowWindow(Process.MainWindowHandle, WindowHandling.SW_HIDE);
 
                 SetStatus(Status.Launching);
-            })
+            }))
             .ContinueWith(t =>
             {
                 Thread.Sleep(Delay * 1000);
@@ -80,6 +87,28 @@ namespace Ready.Core
             SetStatus(Status.WithUser);
         }
 
+        private void OnDispose()
+        {
+            Process.Exited -= Process_Exited;
+            switch (status)
+            {
+                case Status.None:
+                    SetStatus(Status.Killed);
+                    break;
+
+                case Status.Launching:
+                case Status.Available:
+                case Status.Reserved:
+                    Process.Kill();
+                    SetStatus(Status.Killed);
+                    break;
+
+                case Status.WithUser:
+                    // do nothing
+                    break;
+            }
+        }
+        
         private void Process_Exited(object sender, EventArgs e)
         {
             Process.EnableRaisingEvents = false;
@@ -124,6 +153,48 @@ namespace Ready.Core
             if (HasExited != null)
                 HasExited(this, new EventArgs());
         }
+
+        #region IDisposable
+
+        private bool disposed;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this.disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    OnDispose();
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+                //CloseHandle(handle);
+                //handle = IntPtr.Zero;
+
+                // Note disposing has been done.
+                disposed = true;
+            }
+        }
+
+
+        ~Launchable()
+        {
+            Dispose(false);
+        }
+        #endregion
     }
 }
 

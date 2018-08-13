@@ -15,6 +15,7 @@ namespace Ready.Core
         Reserved,
 
         WithUser,
-        Exited
+        Exited,
+        Killed
     }
 }
