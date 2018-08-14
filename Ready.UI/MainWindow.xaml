@@ -5,18 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ready.UI"
         xmlns:controls="clr-namespace:Ready.UI.Controls"
+        xmlns:cmd="clr-namespaec:Ready.UI.AppCommands"
         mc:Ignorable="d" 
         Title="Ready Bar" 
         Height="250" Width="200"
         Loaded="Window_Loaded"
-        Closing="Window_Closing"
         >
     <DockPanel LastChildFill="True">
         <StackPanel x:Name="spButtons" DockPanel.Dock="Bottom" Orientation="Horizontal">
-            <Button Content="Init" Width="50" Click="Button_Click"></Button>
-            <Button Content="Add" Width="50" Click="Button_Click" />
-            <Button Content="Remove" Width="50" Click="Button_Click" />
-            <Button Content="Ex" Width="50" Click="Button_Click" />
+            <Button Content="_" Width="50" />
+            <Button Content="Add" Width="50" Command="local:AppCommands.IncrementProvisionCommand"/>
+            <Button Content="Remove" Width="50" Command="local:AppCommands.DecrementProvisionCommand" />
+            <Button Content="Ex" Width="50" Command="local:AppCommands.ExitCommand" />
+
         </StackPanel>
         <controls:LaunchableMonitorView />
     </DockPanel>

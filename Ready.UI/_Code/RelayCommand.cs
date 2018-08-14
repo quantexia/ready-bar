@@ -46,6 +46,9 @@ namespace Ready.UI
 
     public class RelayCommand : RelayCommand<object>
     {
+        public RelayCommand(Action execute)
+            : this(o => execute(), o => true)
+        { }
         public RelayCommand(Action<object> execute)
             : this(execute, null)
         { }

@@ -21,6 +21,12 @@ namespace Ready.Core
 
         public Launchable Target { get { return target; } }
 
+        public void Provision(string executable, string arguments, int quantity, string displayName = "", int delay = 0)
+        {
+            Launchable lb = new Launchable(executable, arguments, displayName, delay);
+            this.target = lb;
+            SetProvisionLevel(quantity);
+        }
         public void Provision(Launchable lb, int quantity)
         {
             this.target = lb;
@@ -29,6 +35,20 @@ namespace Ready.Core
 
         public int ProvisionLevel { get; private set; }
 
+        public void IncrementProvision()
+        {
+            if (ProvisionLevel == MAX)
+                return;
+
+            SetProvisionLevel(ProvisionLevel + 1);
+        }
+        public void DecrementProvision()
+        {
+            if (ProvisionLevel == MIN)
+                return;
+
+            SetProvisionLevel(ProvisionLevel - 1);
+        }
         public void SetProvisionLevel(int quantity)
         {
             if (quantity < MIN || quantity > MAX)
