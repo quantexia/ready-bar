@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Serilog;
 using System.IO;
+using System.Windows.Input;
 
 namespace Ready.UI
 {
@@ -34,6 +35,7 @@ namespace Ready.UI
 
             AppController.Initialize();
 
+            /*
             string mode = "form";
 
             log.Debug("Running in mode: {mode}", mode);
@@ -43,11 +45,12 @@ namespace Ready.UI
                     break;
                 case "form":
                     MainWindow win = new MainWindow();
-                    win.ShowDialog();
+                    App.Current.MainWindow = win;
                     break;
                 default:
                     break;
             }
+        */
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Ready.Core
             Process.StartInfo = new ProcessStartInfo(Executable, Arguments) {
                                             WindowStyle = ProcessWindowStyle.Minimized};
 
-            Task.Run(() => ExtractIcon());
+            //Task.Run(() => ExtractIcon());
 
             SetStatus(Status.None);
         }

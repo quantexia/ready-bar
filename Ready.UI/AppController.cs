@@ -17,23 +17,29 @@ namespace Ready.UI
 
         public static void Initialize()
         {
+            InitializeConfig();
+        }
+
+        private static void InitializeConfig()
+        { 
             string executable = Configuration.GetValue("Executable");
             string arguments = Configuration.GetValue("Arguments");
             int quantity = Configuration.GetValue<int>("Provision");
 
             log.Information("Target:\nExecuteable:\t{E}\nArguments:\t{A}\nProvision:\t{Q}", executable, arguments, quantity);
 
-            log.Debug("Init monitor");
+            log.Debug("Initializing monitor");
             lmon = new LaunchableMonitor();
             lmon.Provision(executable, arguments, quantity);
-            log.Debug("Init monitor complete");
+            log.Information("Initialization of monitor complete");
 
             /*
             if (!CheckNotRunning())
                 log.Fatal("Program is already running.");
             */
-            
         }
+
+
 
         public static LaunchableMonitor Monitor { get { return lmon; } }
 
