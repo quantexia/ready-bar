@@ -24,23 +24,25 @@ namespace Ready.Core
         {
             log.Debug("c'tor");
 
-            string fullPath = PathHelper.FindExePath(executable);
+            FileInfo fiExec = new FileInfo(PathHelper.FindExePath(executable));
 
-            log.Debug("Launchable created for {0}", fullPath);
+            log.Debug("Launchable created for {0}", fiExec.FullName);
 
-            Executable = fullPath;
+            FullPath = fiExec.FullName;
+            Executable = fiExec.Name;
             Arguments = arguments;
-            DisplayName = displayName ?? executable;
+            DisplayName = displayName ?? Executable;
             Delay = Math.Max(0, delay);
 
             Process = new Process();
-            Process.StartInfo = new ProcessStartInfo(Executable, Arguments) {
+            Process.StartInfo = new ProcessStartInfo(FullPath, Arguments) {
                                             WindowStyle = ProcessWindowStyle.Minimized};
 
             SetStatus(Status.None);
         }
 
         public string Executable { get; private set; }
+        public string FullPath { get; private set; }
         public string Arguments { get; private set; }
         public int Delay { get; private set; }
         public string DisplayName { get; private set; }
@@ -152,7 +154,7 @@ namespace Ready.Core
 
         internal Launchable Clone()
         {
-            Launchable clone = new Launchable(this.Executable, this.Arguments, this.DisplayName, this.Delay);
+            Launchable clone = new Launchable(this.FullPath, this.Arguments, this.DisplayName, this.Delay);
             return clone;
         }
 

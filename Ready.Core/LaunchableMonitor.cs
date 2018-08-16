@@ -20,6 +20,7 @@ namespace Ready.Core
         private Launchable target;
         private const int MIN = 0;
         private const int MAX = 20;
+        private const int NO_PID = -1;
 
         public LaunchableMonitor()
         {
@@ -33,6 +34,7 @@ namespace Ready.Core
         {
             Launchable lb = new Launchable(executable, arguments, displayName, delay);
             this.target = lb;
+            ExtractIcon();
             SetProvisionLevel(quantity);
         }
 
@@ -116,7 +118,7 @@ namespace Ready.Core
         {
             log.Debug("Extracing icon");
             //Icon icon = Icon.ExtractAssociatedIcon(Process.MainModule.FileName);
-            Icon icon = Icon.ExtractAssociatedIcon(target.Executable); // Executable is now Full path
+            Icon icon = Icon.ExtractAssociatedIcon(target.FullPath); 
 
             Image = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                             icon.Handle,
@@ -155,10 +157,14 @@ namespace Ready.Core
             get
             {
                 Launchable l;
-                return !TryGetAvailable(out l);
+                return TryGetAvailable(out l);
             }
         }
 
+        public int NextPid
+        {
+            get { Launchable l; return TryGetAvailable(out l) ? l.Pid : NO_PID; }
+        }
         public Launchable NextAvailable
         {
             get
@@ -184,7 +190,7 @@ namespace Ready.Core
             else 
                 available = coll.FirstOrDefault(l => l.Status == Status.Available);
 
-            return available == null;
+            return available != null;
         }
 
         #region IDisposable

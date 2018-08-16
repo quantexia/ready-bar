@@ -31,17 +31,17 @@ namespace Ready.UI.Controls
 
         private void Check()
         {
-            Notify("Launchable");
-            Notify("HasAvailable");
-            Notify("CountAvailable");
-            Notify("NextPid");
-
-            //Notify("Image");
+            if (DisplayName != lmon.Target.DisplayName) { DisplayName = lmon.Target.DisplayName; Notify("DisplayName"); }
+            if (HasAvailable != lmon.HasAvailable) { HasAvailable = lmon.HasAvailable; Notify("HasAvailable"); }
+            if (CountAvailable != lmon.CountAvailable) { CountAvailable= lmon.CountAvailable; Notify("CountAvailable"); }
+            if (NextPid != lmon.NextPid) { NextPid = lmon.NextPid; Notify("NextPid"); }
         }
 
-        public bool HasAvailable { get { return lmon.HasAvailable; } }
-        public int CountAvailable {  get { return lmon.CountAvailable; } }
-        public int NextPid { get { return lmon.NextAvailable == null ? 0 : lmon.NextAvailable.Pid; } }
+        public string DisplayName { get; set; }
+        public bool HasAvailable { get; set; }
+        public int CountAvailable { get; set; }
+        public int NextPid { get; set; }
+
         public ImageSource Image { get { return lmon.Image; } }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -70,6 +70,7 @@
     <Compile Include="AppController.cs" />
     <Compile Include="CommandLine.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="Controls\Converters.cs" />
     <Compile Include="Controls\LaunchableMonitorView.xaml.cs">
       <DependentUpon>LaunchableMonitorView.xaml</DependentUpon>
     </Compile>
