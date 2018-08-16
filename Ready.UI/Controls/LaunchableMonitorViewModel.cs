@@ -32,16 +32,17 @@ namespace Ready.UI.Controls
         private void Check()
         {
             Notify("Launchable");
-            Notify("Image");
             Notify("HasAvailable");
             Notify("CountAvailable");
             Notify("NextPid");
+
+            //Notify("Image");
         }
 
         public bool HasAvailable { get { return lmon.HasAvailable; } }
         public int CountAvailable {  get { return lmon.CountAvailable; } }
-        public int NextPid { get { return lmon.NextAvailable == null ? 0 : lmon.NextAvailable.Process.Id; } }
-        public ImageSource Image { get { return lmon.Target.Image; } }
+        public int NextPid { get { return lmon.NextAvailable == null ? 0 : lmon.NextAvailable.Pid; } }
+        public ImageSource Image { get { return lmon.Image; } }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

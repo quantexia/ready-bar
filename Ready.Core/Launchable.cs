@@ -12,16 +12,23 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
 using System.Windows;
+using Serilog;
 
 namespace Ready.Core
 {
     public class Launchable : INotifyPropertyChanged, IDisposable
     {
+        private ILogger log = Log.Logger.ForContext<Launchable>();
+
         public Launchable(string executable, string arguments, string displayName = null, int delay = 0)
         {
-            string fullPath = PathHelper.FindExePath(executable);
-            Executable = fullPath;
+            log.Debug("c'tor");
 
+            string fullPath = PathHelper.FindExePath(executable);
+
+            log.Debug("Launchable created for {0}", fullPath);
+
+            Executable = fullPath;
             Arguments = arguments;
             DisplayName = displayName ?? executable;
             Delay = Math.Max(0, delay);
@@ -29,8 +36,6 @@ namespace Ready.Core
             Process = new Process();
             Process.StartInfo = new ProcessStartInfo(Executable, Arguments) {
                                             WindowStyle = ProcessWindowStyle.Minimized};
-
-            //Task.Run(() => ExtractIcon());
 
             SetStatus(Status.None);
         }
@@ -40,22 +45,7 @@ namespace Ready.Core
         public int Delay { get; private set; }
         public string DisplayName { get; private set; }
         public Process Process { get; private set; }
-
-        public ImageSource Image { get; private set; }
-
-        private void ExtractIcon()
-        {
-            //Icon icon = Icon.ExtractAssociatedIcon(Process.MainModule.FileName);
-            Icon icon = Icon.ExtractAssociatedIcon(Executable);
-
-            Image = 
-            System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                icon.Handle,
-                new Int32Rect(0, 0, icon.Width, icon.Height),
-                BitmapSizeOptions.FromEmptyOptions());
-
-            Notify("Image");
-        }
+        public int Pid { get; private set; }
 
         public void Launch()
         {
@@ -64,7 +54,10 @@ namespace Ready.Core
                 Process.EnableRaisingEvents = true;
                 Process.Exited += this.Process_Exited;
 
+                log.Information("Starting new process");
                 Process.Start();
+                Pid = Process.Id;
+
                 Notify("Process");
 
                 Process.WaitForInputIdle();
@@ -74,43 +67,57 @@ namespace Ready.Core
             }))
             .ContinueWith(t =>
             {
+                log.Information("Process {0} is delaying for {1} seconds", Pid, Delay);
                 Thread.Sleep(Delay * 1000);
                 SetStatus(Status.Available);
             });
         }
 
+        public event EventHandler Revealed;
+
         public void Reveal()
         {
             IntPtr hwnd = Process.MainWindowHandle;
             WindowHandling.ShowWindow(hwnd, WindowHandling.SW_SHOWNORMAL);
-            
+
+            log.Information("Process {0} was revealed to user", Pid);
+
             SetStatus(Status.WithUser);
+
+            if (Revealed != null)
+                Revealed(this, new EventArgs());
         }
 
         private void OnDispose()
         {
             Process.Exited -= Process_Exited;
+
             switch (status)
             {
                 case Status.None:
+                    log.Information("Process without pid", Pid);
                     SetStatus(Status.Killed);
                     break;
 
                 case Status.Launching:
                 case Status.Available:
                 case Status.Reserved:
+                    log.Information("Process {0} killed", Pid);
                     Process.Kill();
                     SetStatus(Status.Killed);
                     break;
 
                 case Status.WithUser:
                     // do nothing
+                    log.Information("Process {0} - nothing done", Pid);
                     break;
             }
         }
         
         private void Process_Exited(object sender, EventArgs e)
         {
+            log.Information("Process {0} has exited", Pid);
+
             Process.EnableRaisingEvents = false;
             Process.Exited -= Process_Exited;
             Process.Dispose();
@@ -127,8 +134,10 @@ namespace Ready.Core
                 return;
 
             this.status = status;
+            log.Information("Process {0} has new status {1}", Pid, status);
             Notify("Status");
         }
+
         private Status status;
 
         public Status Status { get { return status; } }
@@ -151,7 +160,10 @@ namespace Ready.Core
         private void RaiseExited()
         {
             if (HasExited != null)
+            {
                 HasExited(this, new EventArgs());
+                log.Debug("Process {0} is raising HasExited event", Pid);
+            }
         }
 
         #region IDisposable
@@ -174,6 +186,7 @@ namespace Ready.Core
                 if (disposing)
                 {
                     // Dispose managed resources.
+                    log.Debug("Process {0} is being disposed", Pid);
                     OnDispose();
                 }
 

@@ -20,20 +20,7 @@ namespace Ready.UI
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            FileInfo fiAsm = new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location);
-            string logFile = fiAsm.Name.Replace(".exe", ".log");
-
-            Log.Logger = new LoggerConfiguration()
-                                .WriteTo.File(logFile, rollingInterval: RollingInterval.Day)
-                                .CreateLogger();
-            Log.Information("\n\n\n\n>>>>>>>>\n\t>>>>>>>>\n\t\t>>>>>>>>\n\t>>>>>>>>\n>>>>>>>>");
-
-            if (e.Args.Length > 0)
-                Configuration.FromCommandLine(e.Args);
-            else
-                Configuration.FromAppSettings();
-
-            AppController.Initialize();
+            AppController.Initialize(e.Args);
 
             /*
             string mode = "form";

@@ -46,5 +46,14 @@ namespace Ready.UI
             this.DataContext = lmvm;
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            AppCommands.ExitCommand.Execute(null, this);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

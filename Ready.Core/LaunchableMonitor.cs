@@ -1,14 +1,21 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Ready.Core
 {
     public class LaunchableMonitor
     {
+        private static ILogger log = Log.Logger.ForContext<LaunchableMonitor>();
+
         private List<Launchable> coll;
         private Launchable target;
         private const int MIN = 0;
@@ -16,6 +23,7 @@ namespace Ready.Core
 
         public LaunchableMonitor()
         {
+            log.Debug("c'tor");
             coll = new List<Launchable>();
         }
 
@@ -27,6 +35,7 @@ namespace Ready.Core
             this.target = lb;
             SetProvisionLevel(quantity);
         }
+
         public void Provision(Launchable lb, int quantity)
         {
             this.target = lb;
@@ -41,6 +50,7 @@ namespace Ready.Core
                 return;
 
             SetProvisionLevel(ProvisionLevel + 1);
+            log.Debug("Provision level is increased to {0}", ProvisionLevel);
         }
         public void DecrementProvision()
         {
@@ -48,6 +58,7 @@ namespace Ready.Core
                 return;
 
             SetProvisionLevel(ProvisionLevel - 1);
+            log.Debug("Provision level is decreased to {0}", ProvisionLevel);
         }
         public void SetProvisionLevel(int quantity)
         {
@@ -77,8 +88,10 @@ namespace Ready.Core
 
         private void Add()
         {
+            log.Debug("Adding");
             Launchable l = target.Clone();
-            l.HasExited += OnLaunchableExit;
+            l.HasExited += OnRevealedOrExited;
+            l.Revealed += OnRevealedOrExited;
             coll.Add(l);
             l.Launch();
         }
@@ -88,30 +101,49 @@ namespace Ready.Core
             Launchable r = NextAvailable;
             if (r != null)
             {
+                log.Debug("Removing");
                 r.SetStatus(Status.Reserved);
-                r.HasExited -= OnLaunchableExit;
+                r.HasExited -= OnRevealedOrExited;
+                r.Revealed -= OnRevealedOrExited;
                 r.Dispose();
                 coll.Remove(r);
             }
         }
 
+        public ImageSource Image { get; private set; }
+
+        private void ExtractIcon()
+        {
+            log.Debug("Extracing icon");
+            //Icon icon = Icon.ExtractAssociatedIcon(Process.MainModule.FileName);
+            Icon icon = Icon.ExtractAssociatedIcon(target.Executable); // Executable is now Full path
+
+            Image = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                            icon.Handle,
+                            new Int32Rect(0, 0, icon.Width, icon.Height),
+                            BitmapSizeOptions.FromEmptyOptions());
+        }
+
         private bool shuttingDown = false;
         private void OnDispose()
         {
+            shuttingDown = true;
             coll.ForEach(l =>
             {
+                l.HasExited -= OnRevealedOrExited;
+                l.Revealed -= OnRevealedOrExited;
+
                 l.Dispose();
-                l.HasExited -= OnLaunchableExit;
             });
 
         }
         
         public IReadOnlyList<Launchable> Launchables { get { return coll; } }
 
-        private void OnLaunchableExit(object sender, EventArgs e)
+        private void OnRevealedOrExited(object sender, EventArgs e)
         {
             Launchable src = (Launchable)sender;
-            src.HasExited -= OnLaunchableExit;
+            src.HasExited -= OnRevealedOrExited;
             coll.Remove(src);
 
             if (!shuttingDown)
