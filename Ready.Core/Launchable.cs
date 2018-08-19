@@ -20,7 +20,7 @@ namespace Ready.Core
     {
         private ILogger log = Log.Logger.ForContext<Launchable>();
 
-        public Launchable(string executable, string arguments, string displayName = null, int delay = 0)
+        public Launchable(string executable, string arguments, string displayName = null, int delay = 0, int separation = 0)
         {
             log.Debug("c'tor");
 
@@ -31,8 +31,9 @@ namespace Ready.Core
             FullPath = fiExec.FullName;
             Executable = fiExec.Name;
             Arguments = arguments;
-            DisplayName = displayName ?? Executable;
+            DisplayName = string.IsNullOrEmpty(displayName) ? Executable : displayName;
             Delay = Math.Max(0, delay);
+            Separation = Math.Max(0, separation);
 
             Process = new Process();
             Process.StartInfo = new ProcessStartInfo(FullPath, Arguments) {
@@ -45,6 +46,7 @@ namespace Ready.Core
         public string FullPath { get; private set; }
         public string Arguments { get; private set; }
         public int Delay { get; private set; }
+        public int Separation { get; private set; }
         public string DisplayName { get; private set; }
         public Process Process { get; private set; }
         public int Pid { get; private set; }
@@ -70,7 +72,7 @@ namespace Ready.Core
             .ContinueWith(t =>
             {
                 log.Information("Process {0} is delaying for {1} seconds", Pid, Delay);
-                Thread.Sleep(Delay * 1000);
+                Thread.Sleep(TimeSpan.FromSeconds(Delay));
                 SetStatus(Status.Available);
             });
         }

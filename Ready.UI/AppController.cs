@@ -33,6 +33,7 @@ namespace Ready.UI
                                     //.WriteTo.File(logFile, rollingInterval: RollingInterval.Day)
                                     .WriteTo.File(logFile)
                                     .MinimumLevel.Debug()
+                                    .ReadFrom.AppSettings()
                                     .CreateLogger();
 
             log = Log.Logger;
@@ -59,12 +60,15 @@ namespace Ready.UI
         {
             string executable = Configuration.GetValue("Executable");
             string arguments = Configuration.GetValue("Arguments");
+            string displayName = Configuration.GetValue("DisplayName");
             int quantity = Configuration.GetValue<int>("Provision");
+            int delay = Configuration.GetValue<int>("Delay");
+            int separation = Configuration.GetValue<int>("Separation");
 
-            log.Information("Target:\nExecuteable:\t{E}\nArguments:\t{A}\nProvision:\t{Q}", executable, arguments, quantity);
+            log.Information("Target:\nExecuteable:\t{E}\nArguments:\t{A}\nProvision:\t{Q}\nDelay:\t{D}\nSeparation:\t{S}", executable, arguments, quantity, delay, separation);
             log.Debug("Initializing monitor");
             lmon = new LaunchableMonitor();
-            lmon.Provision(executable, arguments, quantity);
+            lmon.Provision(executable, arguments, quantity, displayName, delay, separation);
             log.Information("Initialization of monitor complete");
 
             /*

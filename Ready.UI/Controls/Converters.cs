@@ -14,7 +14,7 @@ namespace Ready.UI.Controls
         {
             int pid = (int)value;
 
-            return pid > -1 ? pid.ToString() : string.Empty;
+            return pid > -1 ? pid.ToString() : "none";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

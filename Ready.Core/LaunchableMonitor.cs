@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -21,18 +22,20 @@ namespace Ready.Core
         private const int MIN = 0;
         private const int MAX = 20;
         private const int NO_PID = -1;
+        private Func<int> fnCount;
 
         public LaunchableMonitor()
         {
             log.Debug("c'tor");
             coll = new List<Launchable>();
+            fnCount = () => coll.Count(l => l.Status == Status.Available || l.Status == Status.Launching);
         }
 
         public Launchable Target { get { return target; } }
 
-        public void Provision(string executable, string arguments, int quantity, string displayName = "", int delay = 0)
+        public void Provision(string executable, string arguments, int quantity, string displayName = "", int delay = 0, int separation = 0)
         {
-            Launchable lb = new Launchable(executable, arguments, displayName, delay);
+            Launchable lb = new Launchable(executable, arguments, displayName, delay, separation);
             this.target = lb;
             ExtractIcon();
             SetProvisionLevel(quantity);
@@ -44,7 +47,7 @@ namespace Ready.Core
             SetProvisionLevel(quantity);
         }
 
-        public int ProvisionLevel { get; private set; }
+        public int ProvisionLevel { get { return fnCount(); } }
 
         public void IncrementProvision()
         {
@@ -62,30 +65,35 @@ namespace Ready.Core
             SetProvisionLevel(ProvisionLevel - 1);
             log.Debug("Provision level is decreased to {0}", ProvisionLevel);
         }
+
+        private int targetProvLevel;
         public void SetProvisionLevel(int quantity)
         {
+            if (shuttingDown)
+                return;
             if (quantity < MIN || quantity > MAX)
                 throw new ArgumentOutOfRangeException("quantity", string.Format("Must be between {0} and {1}", MIN, MAX));
 
-            ProvisionLevel = quantity;
+            targetProvLevel = quantity;
+            //ProvisionLevel = quantity;
 
-            int cnt = coll.Count(l => l.Status == Status.Available);
-            int delta = quantity - cnt;
 
-            switch(Math.Sign(delta))
-            { 
-                case -1:
-                    Enumerable.Range(0, -delta)
-                                .ForEach(i => Remove());
-                    break;
-                case 1:
-                    Enumerable.Range(0, delta)
-                                .ForEach(i => Add());
-                    break;
-                case 0:
-                    /*nothing*/
-                    break;
-            }
+
+            int delta = targetProvLevel - fnCount();
+
+            if (delta == 0)
+                return;
+
+            Task t = new Task(() =>
+            {
+                while (delta != 0)
+                {
+                    if (Math.Sign(delta) < 0) Remove(); else Add();
+                    Thread.Sleep(TimeSpan.FromSeconds(target.Separation));
+                    delta -= Math.Sign(delta);
+                }
+            });
+            t.Start();
         }
 
         private void Add()
@@ -94,6 +102,7 @@ namespace Ready.Core
             Launchable l = target.Clone();
             l.HasExited += OnRevealedOrExited;
             l.Revealed += OnRevealedOrExited;
+
             coll.Add(l);
             l.Launch();
         }
@@ -117,7 +126,7 @@ namespace Ready.Core
         private void ExtractIcon()
         {
             log.Debug("Extracing icon");
-            //Icon icon = Icon.ExtractAssociatedIcon(Process.MainModule.FileName);
+
             Icon icon = Icon.ExtractAssociatedIcon(target.FullPath); 
 
             Image = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
