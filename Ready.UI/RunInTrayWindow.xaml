@@ -4,16 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ready.UI"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
         Title="RunInTrayWindow" Height="450" Width="800"
         >
-    <Window.Resources>
-        <ContextMenu x:Key="NotifierContextMenu" Placement="MousePoint">
-            <MenuItem Header="Open" Click="Menu_Open"/>
-            <MenuItem Header="Close" Click="Menu_Close"/>
-        </ContextMenu>
-    </Window.Resources>
-    <Grid>
-        
-    </Grid>
+    <!--
+                    TrayPopup="{StaticResoure TrayStatusPopup}"
+                    -->
+    <tb:TaskbarIcon x:Name="myNotifyIcon"
+                    Visibility="Visible"
+                    IconSource="Images/application.ico"
+                    ToolTipText="hello world" 
+      />
 </Window>
