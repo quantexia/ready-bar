@@ -20,7 +20,7 @@ namespace Ready.UI.Controls
         public LaunchableMonitorViewModel(LaunchableMonitor lmon)
         {
             this.lmon = lmon;
-            LaunchCommand = new RelayCommand(o => lmon.NextAvailable.Reveal(), o => !shutdown && lmon.HasAvailable);
+            LaunchCommand = new RelayCommand(o => lmon.RevealNext(), o => !shutdown && lmon.HasAvailable);
             CloseCommand = new RelayCommand(o => OnClose(), o => true);
 
             ct = new CancellationToken();

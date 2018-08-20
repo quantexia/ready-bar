@@ -23,15 +23,5 @@ namespace Ready.UI
         {
             InitializeComponent();
         }
-
-        private void Menu_Open(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Open");
-        }
-
-        private void Menu_Close(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Close");
-        }
     }
 }

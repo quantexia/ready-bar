@@ -19,8 +19,8 @@ namespace Ready.Core
 
         private List<Launchable> coll;
         private Launchable target;
-        private const int MIN = 0;
-        private const int MAX = 20;
+        public const int PROVISIONLEVEL_MIN = 0;
+        public const int PROVISIONLEVEL_MAX = 20;
         private const int NO_PID = -1;
         private Func<int> fnCount;
 
@@ -51,7 +51,7 @@ namespace Ready.Core
 
         public void IncrementProvision()
         {
-            if (ProvisionLevel == MAX)
+            if (ProvisionLevel == PROVISIONLEVEL_MAX)
                 return;
 
             SetProvisionLevel(ProvisionLevel + 1);
@@ -59,7 +59,7 @@ namespace Ready.Core
         }
         public void DecrementProvision()
         {
-            if (ProvisionLevel == MIN)
+            if (ProvisionLevel == PROVISIONLEVEL_MIN)
                 return;
 
             SetProvisionLevel(ProvisionLevel - 1);
@@ -71,8 +71,8 @@ namespace Ready.Core
         {
             if (shuttingDown)
                 return;
-            if (quantity < MIN || quantity > MAX)
-                throw new ArgumentOutOfRangeException("quantity", string.Format("Must be between {0} and {1}", MIN, MAX));
+            if (quantity < PROVISIONLEVEL_MIN || quantity > PROVISIONLEVEL_MAX)
+                throw new ArgumentOutOfRangeException("quantity", string.Format("Must be between {0} and {1}", PROVISIONLEVEL_MIN, PROVISIONLEVEL_MAX));
 
             targetProvLevel = quantity;
             //ProvisionLevel = quantity;
@@ -109,7 +109,7 @@ namespace Ready.Core
 
         private void Remove()
         {
-            Launchable r = NextAvailable;
+            Launchable r = GetNextAvailable();
             if (r != null)
             {
                 log.Debug("Removing");
@@ -174,14 +174,19 @@ namespace Ready.Core
         {
             get { Launchable l; return TryGetAvailable(out l) ? l.Pid : NO_PID; }
         }
-        public Launchable NextAvailable
+
+        private Launchable GetNextAvailable()
         {
-            get
-            {
-                Launchable l;
-                TryGetAvailable(out l);
-                return l;
-            }
+            Launchable l;
+            TryGetAvailable(out l);
+            return l;
+        }
+        
+        public void RevealNext()
+        {
+            Launchable next = GetNextAvailable();
+            if (next != null)
+                next.Reveal();
         }
 
         public int CountAvailable

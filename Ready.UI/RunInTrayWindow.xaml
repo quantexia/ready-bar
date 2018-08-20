@@ -6,14 +6,38 @@
         xmlns:local="clr-namespace:Ready.UI"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         mc:Ignorable="d"
-        Title="RunInTrayWindow" Height="450" Width="800"
+        WindowStyle="None" Visibility="Hidden" ShowInTaskbar="False"
+        Title="RunInTrayWindow" Height="200" Width="300"
         >
-    <!--
-                    TrayPopup="{StaticResoure TrayStatusPopup}"
-                    -->
-    <tb:TaskbarIcon x:Name="myNotifyIcon"
+
+    <Window.Resources>
+        <Style x:Key="styButton" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="0,10" />
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="Aqua"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <local:AppCommands x:Key="commands"/>
+    </Window.Resources>
+    
+    <tb:TaskbarIcon x:Name="myNotifyIcon" 
                     Visibility="Visible"
                     IconSource="Images/application.ico"
-                    ToolTipText="hello world" 
-      />
+                    ToolTipText="Ready Bar Launcher" 
+                    DoubleClickCommand="local:AppCommands.RevealCommand"
+                    PopupActivation="LeftClick"
+      >
+        <tb:TaskbarIcon.TrayPopup>
+            <Border Background="White" BorderBrush="Orange" BorderThickness="2" CornerRadius="4" Width="140" Height="40">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Reveal" Style="{StaticResource styButton}" Command="local:AppCommands.RevealCommand" />
+                    <Button Content="Exit" Style="{StaticResource styButton}" Command="local:AppCommands.RevealCommand"  />
+                </StackPanel>
+            </Border>
+        </tb:TaskbarIcon.TrayPopup>
+
+    </tb:TaskbarIcon>
 </Window>

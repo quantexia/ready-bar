@@ -48,6 +48,9 @@ namespace Ready.UI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (!AppCommands.ExitCommand.CanExecute(null, this))
+                return;
+
             AppCommands.ExitCommand.Execute(null, this);
         }
 
