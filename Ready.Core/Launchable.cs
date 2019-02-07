@@ -113,7 +113,7 @@ namespace Ready.Core
 
                 case Status.WithUser:
                     // do nothing
-                    log.Information("Process {0} - nothing done", Pid);
+                    log.Information("Process {0} - is 'with user' so nothing done", Pid);
                     break;
             }
         }
